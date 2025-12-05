@@ -1,3 +1,11 @@
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string; // Em um app real, isso seria um hash
+  createdAt: string;
+}
+
 export interface LotteryGame {
   numbers: number[];
   reasoning: string;

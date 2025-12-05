@@ -1,18 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { generateOptimizedGames } from './services/geminiService';
-import { GenerationResponse } from './types';
+import { authService } from './services/authService';
+import { GenerationResponse, User } from './types';
 import { GameCard } from './components/GameCard';
 import { StatsChart } from './components/StatsChart';
-import { BrainCircuit, Loader2, Dna, AlertTriangle, Clover, Database, ScanSearch } from 'lucide-react';
+import { Auth } from './components/Auth';
+import { BrainCircuit, Loader2, Dna, AlertTriangle, Clover, Database, ScanSearch, LogOut, User as UserIcon } from 'lucide-react';
 
 const App: React.FC = () => {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [data, setData] = useState<GenerationResponse | null>(null);
   const [gameCount, setGameCount] = useState<number>(3);
   const [error, setError] = useState<string | null>(null);
 
-  // Cycling loading messages to show "Revolutionary" process
+  // Check login on load
+  useEffect(() => {
+    const currentUser = authService.getCurrentUser();
+    if (currentUser) {
+      setUser(currentUser);
+    }
+  }, []);
+
+  // Cycling loading messages
   useEffect(() => {
     let interval: any;
     if (loading) {
@@ -31,7 +42,7 @@ const App: React.FC = () => {
         if (step < steps.length) {
           setLoadingStep(step);
         }
-      }, 800); // Change text every 800ms
+      }, 800);
     }
     return () => clearInterval(interval);
   }, [loading]);
@@ -54,53 +65,74 @@ const App: React.FC = () => {
       const result = await generateOptimizedGames(gameCount);
       setData(result);
     } catch (err) {
-      setError("Erro ao conectar com a inteligência artificial. Verifique sua chave API ou tente novamente.");
+      setError("Erro ao conectar com a inteligência artificial. Tente novamente em instantes.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleLogout = () => {
+    authService.logout();
+    setUser(null);
+    setData(null);
+  };
+
+  // If not logged in, show Auth Screen
+  if (!user) {
+    return <Auth onLogin={setUser} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pb-12">
       {/* Header */}
       <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-20 shadow-2xl">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-               <Clover className="text-emerald-500" size={28} />
+               <Clover className="text-emerald-500" size={24} />
             </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 bg-clip-text text-transparent filter drop-shadow-sm">
-                MegaSena AI Revolution
+            <div className="hidden sm:block">
+              <h1 className="text-lg font-bold bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 bg-clip-text text-transparent">
+                Mega Sena Inteligente
               </h1>
-              <p className="text-[10px] sm:text-xs text-slate-400 font-mono tracking-wide uppercase">
-                Sistema Preditivo & Verificador Histórico
+              <p className="text-[10px] text-slate-400 font-mono tracking-wide uppercase">
+                Sistema Premium
               </p>
             </div>
           </div>
-          <div className="hidden sm:flex items-center gap-2 bg-slate-800/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-700/50">
-             <BrainCircuit size={16} className="text-purple-400" />
-             <span className="text-xs font-semibold text-slate-300">v3.5 Neural Core</span>
+          
+          <div className="flex items-center gap-4">
+             <div className="flex items-center gap-2 text-sm text-slate-300 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+                <UserIcon size={14} className="text-emerald-400"/>
+                <span className="truncate max-w-[100px] sm:max-w-none">{user.name}</span>
+             </div>
+             
+             <button 
+               onClick={handleLogout}
+               className="text-slate-400 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-slate-800"
+               title="Sair"
+             >
+                <LogOut size={20} />
+             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 mt-8 relative">
+      <main className="max-w-5xl mx-auto px-4 mt-8 relative">
         
         {/* Intro / Controls */}
         <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.3)] relative overflow-hidden">
            {/* Decorative elements */}
            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-           <div className="absolute bottom-0 left-0 w-40 h-40 bg-purple-500/5 rounded-full blur-[60px] translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
-
+           
           <div className="text-center mb-8 relative z-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
               Geração de Apostas <span className="text-emerald-400">Verificadas</span>
             </h2>
             <p className="text-slate-400 max-w-xl mx-auto leading-relaxed text-sm sm:text-base">
-              Este sistema revolucionário utiliza IA para analisar quadrantes, 
+              Olá, <span className="text-white font-semibold">{user.name}</span>. Nosso sistema utiliza IA para analisar quadrantes, 
               <span className="text-emerald-400 font-semibold mx-1 inline-flex items-center gap-1"><Database size={12}/> cruzar dados históricos</span> 
-              para evitar repetições e projetar a Quadra/Sena matematicamente.
+              e projetar a Quadra/Sena matematicamente.
             </p>
           </div>
 
@@ -109,7 +141,7 @@ const App: React.FC = () => {
               <select 
                 value={gameCount}
                 onChange={(e) => setGameCount(Number(e.target.value))}
-                className="w-full sm:w-64 appearance-none bg-slate-950 text-white pl-4 pr-10 py-3.5 rounded-xl border border-slate-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all font-semibold shadow-inner"
+                className="w-full sm:w-64 appearance-none bg-slate-950 text-white pl-4 pr-10 py-3.5 rounded-xl border border-slate-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all font-semibold shadow-inner cursor-pointer hover:bg-slate-900"
                 disabled={loading}
               >
                 <option value={1}>Gerar 1 Jogo Mestre (Sena)</option>
@@ -135,7 +167,7 @@ const App: React.FC = () => {
             >
               <div className="relative z-10 flex items-center justify-center gap-2">
                 {loading ? <Loader2 className="animate-spin" size={20} /> : <Dna size={20} />}
-                <span>{loading ? 'Processando...' : 'Gerar Jogos Revolucionários'}</span>
+                <span>{loading ? 'Processando...' : 'Gerar Jogos Inteligentes'}</span>
               </div>
               {!loading && <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 blur-md"></div>}
             </button>
@@ -166,10 +198,13 @@ const App: React.FC = () => {
           <div className="mt-12 space-y-8 animate-slide-up">
             
             <div className="bg-slate-800/80 backdrop-blur-md rounded-xl p-6 border border-slate-700 shadow-lg">
-               <h3 className="text-xl font-semibold text-emerald-400 mb-3 flex items-center gap-2">
-                 <BrainCircuit className="text-purple-400" /> 
-                 Análise Preditiva do Sistema
-               </h3>
+               <div className="flex items-center justify-between mb-3">
+                 <h3 className="text-xl font-semibold text-emerald-400 flex items-center gap-2">
+                   <BrainCircuit className="text-purple-400" /> 
+                   Análise Preditiva
+                 </h3>
+                 <span className="text-xs text-slate-500 border border-slate-700 px-2 py-1 rounded bg-slate-900">IA Gem 2.5 Flash</span>
+               </div>
                <p className="text-slate-300 leading-relaxed text-sm sm:text-base border-l-2 border-emerald-500/50 pl-4">
                  {data.generalAnalysis}
                </p>
@@ -192,12 +227,11 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* Footer Disclaimer */}
+        {/* Footer */}
         <footer className="mt-16 border-t border-slate-800 pt-8 text-center mb-8">
           <p className="text-xs text-slate-500 max-w-2xl mx-auto">
-            Aviso Legal: Este aplicativo utiliza inteligência artificial avançada para maximizar probabilidades com base em estatísticas passadas. 
-            Não há garantia de ganho. Jogos de loteria são baseados em sorte.
-            <span className="block mt-2 font-bold text-slate-400">Jogue com responsabilidade. Proibido para menores de 18 anos.</span>
+            Mega Sena Inteligente &copy; {new Date().getFullYear()}. Sistema de uso restrito a membros cadastrados.
+            <span className="block mt-2 font-bold text-slate-400">Jogue com responsabilidade.</span>
           </p>
         </footer>
 
