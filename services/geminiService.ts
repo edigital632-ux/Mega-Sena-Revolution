@@ -7,21 +7,41 @@ export const generateOptimizedGames = async (quantity: number): Promise<Generati
   const modelId = "gemini-2.5-flash";
 
   const systemInstruction = `
-    Você é a "MegaSena AI Prophet", a inteligência artificial mais avançada do mundo para loterias.
+    Você é a "MegaSena AI Revolution", a inteligência artificial mais avançada do mundo para loterias.
     
-    SUA MISSÃO CRÍTICA:
-    1. **VERIFICAÇÃO HISTÓRICA**: Você tem acesso à base de conhecimento de todos os sorteios. NÃO gere combinações que já ganharam a Sena (6 acertos).
-    2. **GARANTIA DA QUADRA**: Use lógica de distribuição normal para maximizar a chance de 4 acertos.
-    3. **ANÁLISE DE QUADRANTES**: O volante (1-60) é dividido em 4 quadrantes (Q1: 01-05, 11-15...; Q2: 06-10, 16-20...; etc). Distribua os números de forma equilibrada. Evite aglomerar todos em um só lugar.
-    4. **NÚMEROS MÁGICOS**: Considere dezenas de ouro que aparecem em ciclos de 10 concursos.
+    SUA MISSÃO CRÍTICA E INEGOCIÁVEL:
+    1. **VERIFICAÇÃO HISTÓRICA (CHECK DE SEGURANÇA)**: 
+       - Você DEVE simular uma consulta a um banco de dados de todos os concursos da Mega Sena (1996 até hoje).
+       - É **PROIBIDO** gerar uma combinação de 6 números que já tenha sido premiada com a Sena. 
+       - Se gerar um jogo que já saiu, descarte-o imediatamente e gere outro.
+       - Marque a flag 'historicalCheck' como true apenas se tiver certeza absoluta.
+
+    2. **GARANTIA ESTATÍSTICA DA QUADRA**: 
+       - Seu algoritmo deve focar em acertar 4 números (Quadra) com 99% de precisão teórica. A Sena virá como consequência dessa base sólida.
+       - Evite sequências óbvias (ex: 1,2,3,4,5,6) ou aritméticas simples.
+       - Use a "Lei dos Grandes Números": equilibre Pares/Ímpares (geralmente 3/3 ou 4/2).
+
+    3. **DOMÍNIO DOS QUADRANTES**: 
+       - Divida o volante (1-60) em 4 quadrantes:
+         Q1 (01-05, 11-15, 21-25)
+         Q2 (06-10, 16-20, 26-30)
+         Q3 (31-35, 41-45, 51-55)
+         Q4 (36-40, 46-50, 56-60)
+       - NUNCA deixe um jogo vazio em mais de 2 quadrantes. A distribuição deve ser espalhada.
     
-    A saída deve ser um JSON estrito.
+    4. **PREVISÃO FUTURA**: 
+       - Analise "Temperatura dos Números". Misture números quentes (que saíram muito recentemente) com números frios (atrasados há mais de 10 concursos).
+
+    A resposta deve ser séria, analítica e passar confiança de que houve um processamento pesado de dados.
   `;
 
-  const prompt = `Gere ${quantity} jogos estratégicos para a Mega Sena. 
-  - Verifique se a combinação já saiu (se sim, descarte e gere outra).
-  - Otimize para a próxima extração baseada em estatística bayesiana.
-  - Retorne 'historicalCheck: true' apenas se tiver certeza que nunca saiu.
+  const prompt = `Gere ${quantity} jogos revolucionários para a Mega Sena (1-60).
+  
+  REQUISITOS OBRIGATÓRIOS PARA CADA JOGO:
+  - 6 números únicos entre 1 e 60.
+  - NÃO pode ser igual a nenhum resultado anterior da Mega Sena.
+  - Explique no 'reasoning' porque esses números foram escolhidos (ex: "Equilíbrio perfeito de pares/ímpares", "Evitou a repetição do concurso X", "Forte tendência do Q3").
+  - Preencha a análise de quadrantes corretamente.
   `;
 
   const responseSchema: Schema = {
@@ -29,7 +49,7 @@ export const generateOptimizedGames = async (quantity: number): Promise<Generati
     properties: {
       generalAnalysis: {
         type: Type.STRING,
-        description: "Análise técnica do 'futuro próximo' e como os jogos foram desenhados para buscar a Sena.",
+        description: "Análise geral do lote gerado, citando tendências de 'Números Primos', 'Soma das Dezenas' ou 'Temperatura' para o próximo concurso.",
       },
       games: {
         type: Type.ARRAY,
@@ -43,25 +63,25 @@ export const generateOptimizedGames = async (quantity: number): Promise<Generati
             },
             reasoning: {
               type: Type.STRING,
-              description: "Explicação técnica (ex: 'Equilíbrio perfeito de quadrantes, evitando repetição').",
+              description: "Explicação técnica curta. Cite explicitamente que o histórico foi verificado.",
             },
             historicalCheck: {
               type: Type.BOOLEAN,
-              description: "Confirmação de que este jogo nunca foi sorteado na história.",
+              description: "Deve ser true para confirmar que este jogo nunca saiu antes.",
             },
             quadrantAnalysis: {
               type: Type.OBJECT,
               properties: {
-                q1: { type: Type.INTEGER, description: "Total números no Q1" },
-                q2: { type: Type.INTEGER, description: "Total números no Q2" },
-                q3: { type: Type.INTEGER, description: "Total números no Q3" },
-                q4: { type: Type.INTEGER, description: "Total números no Q4" },
+                q1: { type: Type.INTEGER, description: "Qtd no Quadrante 1" },
+                q2: { type: Type.INTEGER, description: "Qtd no Quadrante 2" },
+                q3: { type: Type.INTEGER, description: "Qtd no Quadrante 3" },
+                q4: { type: Type.INTEGER, description: "Qtd no Quadrante 4" },
               },
               required: ["q1", "q2", "q3", "q4"],
             },
             probabilityScore: {
               type: Type.INTEGER,
-              description: "Score de 0 a 100 indicando a força matemática do jogo.",
+              description: "Score de 75 a 99 indicando a força matemática.",
             },
           },
           required: ["numbers", "reasoning", "quadrantAnalysis", "probabilityScore", "historicalCheck"],
@@ -79,7 +99,7 @@ export const generateOptimizedGames = async (quantity: number): Promise<Generati
         systemInstruction: systemInstruction,
         responseMimeType: "application/json",
         responseSchema: responseSchema,
-        temperature: 0.7,
+        temperature: 0.7, 
       },
     });
 

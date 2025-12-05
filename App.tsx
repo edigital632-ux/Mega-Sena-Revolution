@@ -3,17 +3,47 @@ import { generateOptimizedGames } from './services/geminiService';
 import { GenerationResponse } from './types';
 import { GameCard } from './components/GameCard';
 import { StatsChart } from './components/StatsChart';
-import { BrainCircuit, Loader2, Dna, AlertTriangle, Clover } from 'lucide-react';
+import { BrainCircuit, Loader2, Dna, AlertTriangle, Clover, Database, ScanSearch } from 'lucide-react';
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [data, setData] = useState<GenerationResponse | null>(null);
   const [gameCount, setGameCount] = useState<number>(3);
   const [error, setError] = useState<string | null>(null);
 
+  // Cycling loading messages to show "Revolutionary" process
   useEffect(() => {
-    console.log("MegaSena AI Prophet v3.1 Live - System Ready");
-  }, []);
+    let interval: any;
+    if (loading) {
+      setLoadingStep(0);
+      const steps = [
+        "Conectando à Rede Neural...",
+        "Acessando Banco de Dados Histórico (1996-2025)...",
+        "Verificando Combinações Repetidas...",
+        "Calculando Distribuição de Quadrantes...",
+        "Otimizando Probabilidade de Quadra...",
+        "Finalizando Jogos..."
+      ];
+      let step = 0;
+      interval = setInterval(() => {
+        step++;
+        if (step < steps.length) {
+          setLoadingStep(step);
+        }
+      }, 800); // Change text every 800ms
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  const loadingMessages = [
+    "Conectando à Rede Neural...",
+    "Acessando Banco de Dados Histórico...",
+    "Verificando Combinações Repetidas...",
+    "Calculando Distribuição de Quadrantes...",
+    "Otimizando Probabilidade de Quadra...",
+    "Finalizando Jogos..."
+  ];
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -24,7 +54,6 @@ const App: React.FC = () => {
       const result = await generateOptimizedGames(gameCount);
       setData(result);
     } catch (err) {
-      console.error(err);
       setError("Erro ao conectar com a inteligência artificial. Verifique sua chave API ou tente novamente.");
     } finally {
       setLoading(false);
@@ -34,36 +63,44 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pb-12">
       {/* Header */}
-      <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-10 shadow-lg shadow-emerald-900/10">
+      <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-20 shadow-2xl">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-               <Clover className="text-emerald-500 animate-pulse" size={28} />
+               <Clover className="text-emerald-500" size={28} />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-                MegaSena AI Prophet
+              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500 bg-clip-text text-transparent filter drop-shadow-sm">
+                MegaSena AI Revolution
               </h1>
-              <p className="text-xs text-slate-400 hidden sm:block">Sistema Preditivo & Verificador Histórico</p>
+              <p className="text-[10px] sm:text-xs text-slate-400 font-mono tracking-wide uppercase">
+                Sistema Preditivo & Verificador Histórico
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 shadow-inner">
+          <div className="hidden sm:flex items-center gap-2 bg-slate-800/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-700/50">
              <BrainCircuit size={16} className="text-purple-400" />
-             <span className="text-xs font-semibold text-emerald-400">v3.1 Live</span>
+             <span className="text-xs font-semibold text-slate-300">v3.5 Neural Core</span>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 mt-8">
+      <main className="max-w-4xl mx-auto px-4 mt-8 relative">
         
         {/* Intro / Controls */}
-        <section className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-          
+        <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.3)] relative overflow-hidden">
+           {/* Decorative elements */}
+           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+           <div className="absolute bottom-0 left-0 w-40 h-40 bg-purple-500/5 rounded-full blur-[60px] translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+
           <div className="text-center mb-8 relative z-10">
-            <h2 className="text-3xl font-bold text-white mb-3">Geração Inteligente de Apostas</h2>
-            <p className="text-slate-400 max-w-xl mx-auto leading-relaxed">
-              Este sistema revolucionário analisa quadrantes, <span className="text-emerald-400 font-semibold">verifica histórico para não repetir a Sena</span> e projeta combinações futuras visando garantir matematicamente a Quadra.
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+              Geração de Apostas <span className="text-emerald-400">Verificadas</span>
+            </h2>
+            <p className="text-slate-400 max-w-xl mx-auto leading-relaxed text-sm sm:text-base">
+              Este sistema revolucionário utiliza IA para analisar quadrantes, 
+              <span className="text-emerald-400 font-semibold mx-1 inline-flex items-center gap-1"><Database size={12}/> cruzar dados históricos</span> 
+              para evitar repetições e projetar a Quadra/Sena matematicamente.
             </p>
           </div>
 
@@ -72,10 +109,10 @@ const App: React.FC = () => {
               <select 
                 value={gameCount}
                 onChange={(e) => setGameCount(Number(e.target.value))}
-                className="w-full sm:w-auto appearance-none bg-slate-950 text-white pl-4 pr-10 py-3 rounded-xl border border-slate-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all font-semibold"
+                className="w-full sm:w-64 appearance-none bg-slate-950 text-white pl-4 pr-10 py-3.5 rounded-xl border border-slate-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all font-semibold shadow-inner"
                 disabled={loading}
               >
-                <option value={1}>Gerar 1 Jogo Mestre</option>
+                <option value={1}>Gerar 1 Jogo Mestre (Sena)</option>
                 <option value={3}>Gerar 3 Jogos Estratégicos</option>
                 <option value={6}>Gerar 6 Jogos (Fechamento)</option>
                 <option value={10}>Gerar 10 Jogos (Máximo)</option>
@@ -89,19 +126,31 @@ const App: React.FC = () => {
               onClick={handleGenerate}
               disabled={loading}
               className={`
-                w-full sm:w-auto group relative px-8 py-3 rounded-xl font-bold text-white shadow-lg transition-all duration-300
+                w-full sm:w-auto group relative px-8 py-3.5 rounded-xl font-bold text-white shadow-xl transition-all duration-300 overflow-hidden
                 ${loading 
                   ? 'bg-slate-700 cursor-not-allowed' 
-                  : 'bg-emerald-600 hover:bg-emerald-500 hover:shadow-emerald-500/25 active:scale-95'
+                  : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 hover:shadow-emerald-500/25 active:scale-95 border border-emerald-500/20'
                 }
               `}
             >
-              <div className="flex items-center justify-center gap-2">
-                {loading ? <Loader2 className="animate-spin" /> : <Dna />}
-                <span>{loading ? 'Analisando Futuro...' : 'Gerar Jogos Revolucionários'}</span>
+              <div className="relative z-10 flex items-center justify-center gap-2">
+                {loading ? <Loader2 className="animate-spin" size={20} /> : <Dna size={20} />}
+                <span>{loading ? 'Processando...' : 'Gerar Jogos Revolucionários'}</span>
               </div>
+              {!loading && <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 blur-md"></div>}
             </button>
           </div>
+          
+          {loading && (
+            <div className="mt-6 text-center animate-fade-in">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900/50 rounded-full border border-emerald-500/30">
+                    <ScanSearch size={14} className="text-emerald-400 animate-pulse" />
+                    <span className="text-xs sm:text-sm font-mono text-emerald-300">
+                        {loadingMessages[Math.min(loadingStep, loadingMessages.length - 1)]}
+                    </span>
+                </div>
+            </div>
+          )}
         </section>
 
         {/* Error State */}
@@ -116,12 +165,12 @@ const App: React.FC = () => {
         {data && (
           <div className="mt-12 space-y-8 animate-slide-up">
             
-            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 shadow-inner">
-               <h3 className="text-xl font-semibold text-emerald-400 mb-2 flex items-center gap-2">
+            <div className="bg-slate-800/80 backdrop-blur-md rounded-xl p-6 border border-slate-700 shadow-lg">
+               <h3 className="text-xl font-semibold text-emerald-400 mb-3 flex items-center gap-2">
                  <BrainCircuit className="text-purple-400" /> 
-                 Análise Preditiva da IA
+                 Análise Preditiva do Sistema
                </h3>
-               <p className="text-slate-300 leading-relaxed">
+               <p className="text-slate-300 leading-relaxed text-sm sm:text-base border-l-2 border-emerald-500/50 pl-4">
                  {data.generalAnalysis}
                </p>
             </div>
@@ -133,20 +182,23 @@ const App: React.FC = () => {
             </div>
 
             {/* Charts Area */}
-            <div className="bg-slate-900 rounded-xl p-6 border border-slate-800">
+            <div className="bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-xl">
+               <div className="flex items-center justify-between mb-4">
+                 <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Balanceamento de Quadrantes</h4>
+                 <div className="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-500 border border-slate-700">Analytics</div>
+               </div>
                <StatsChart games={data.games} />
             </div>
           </div>
         )}
 
         {/* Footer Disclaimer */}
-        <footer className="mt-16 border-t border-slate-800 pt-8 text-center pb-8">
+        <footer className="mt-16 border-t border-slate-800 pt-8 text-center mb-8">
           <p className="text-xs text-slate-500 max-w-2xl mx-auto">
-            Aviso Legal: Este aplicativo utiliza inteligência artificial avançada para maximizar probabilidades. 
-            Embora projetado para garantir a Quadra através de lógica matemática rigorosa, sorteios são eventos estocásticos. 
-            <span className="font-bold text-slate-400">Jogue com responsabilidade.</span>
+            Aviso Legal: Este aplicativo utiliza inteligência artificial avançada para maximizar probabilidades com base em estatísticas passadas. 
+            Não há garantia de ganho. Jogos de loteria são baseados em sorte.
+            <span className="block mt-2 font-bold text-slate-400">Jogue com responsabilidade. Proibido para menores de 18 anos.</span>
           </p>
-          <p className="text-[10px] text-slate-700 mt-2 font-mono">Build ID: {new Date().getTime().toString().slice(-6)}</p>
         </footer>
 
       </main>
