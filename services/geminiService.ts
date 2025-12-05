@@ -7,23 +7,21 @@ export const generateOptimizedGames = async (quantity: number): Promise<Generati
   const modelId = "gemini-2.5-flash";
 
   const systemInstruction = `
-    Você é a "MegaSena AI Revolution", a inteligência artificial mais avançada do mundo para loterias.
+    Você é a "MegaSena AI Prophet", a inteligência artificial mais avançada do mundo para loterias.
     
     SUA MISSÃO CRÍTICA:
-    1. **VERIFICAÇÃO HISTÓRICA RIGOROSA**: Você possui conhecimento interno de todos os resultados passados da Mega Sena. É ESTRITAMENTE PROIBIDO gerar uma combinação de 6 números que já tenha ganhado a Sena (6 acertos) anteriormente. Verifique mentalmente antes de emitir.
-    2. **GARANTIA DA QUADRA**: Sua lógica estatística deve ser tão robusta que o objetivo é tornar a Quadra (4 acertos) matematicamente inevitável para o futuro próximo. Use padrões de desvio padrão e distribuição normal.
-    3. **ANÁLISE DE QUADRANTES**: Divida o volante (1-60) em 4 quadrantes. Jamais concentre números em apenas um ou dois quadrantes. Distribua-os estrategicamente para cobrir a maior área de probabilidade.
-    4. **PREVISÃO FUTURA**: Analise tendências de números "quentes" (frequentes recentes) e "frios" (atrasados) para projetar o que deve sair no próximo sorteio.
+    1. **VERIFICAÇÃO HISTÓRICA**: Você tem acesso à base de conhecimento de todos os sorteios. NÃO gere combinações que já ganharam a Sena (6 acertos).
+    2. **GARANTIA DA QUADRA**: Use lógica de distribuição normal para maximizar a chance de 4 acertos.
+    3. **ANÁLISE DE QUADRANTES**: O volante (1-60) é dividido em 4 quadrantes (Q1: 01-05, 11-15...; Q2: 06-10, 16-20...; etc). Distribua os números de forma equilibrada. Evite aglomerar todos em um só lugar.
+    4. **NÚMEROS MÁGICOS**: Considere dezenas de ouro que aparecem em ciclos de 10 concursos.
     
-    A saída deve ser técnica, precisa e focada em resultados. Você não está "chutando", você está "calculando o futuro".
+    A saída deve ser um JSON estrito.
   `;
 
-  const prompt = `Gere ${quantity} jogos revolucionários para a Mega Sena (1-60). 
-  Para cada jogo:
-  - Escolha 6 números que NÃO repetem Sena anterior.
-  - Otimize para garantir estatisticamente ao menos a Quadra.
-  - Explique o raciocínio baseado nos quadrantes e histórico.
-  - Confirme explicitamente que verificou o histórico.
+  const prompt = `Gere ${quantity} jogos estratégicos para a Mega Sena. 
+  - Verifique se a combinação já saiu (se sim, descarte e gere outra).
+  - Otimize para a próxima extração baseada em estatística bayesiana.
+  - Retorne 'historicalCheck: true' apenas se tiver certeza que nunca saiu.
   `;
 
   const responseSchema: Schema = {
@@ -45,19 +43,19 @@ export const generateOptimizedGames = async (quantity: number): Promise<Generati
             },
             reasoning: {
               type: Type.STRING,
-              description: "Explicação técnica (ex: 'Padrão Q2 dominante, evitando repetição do concurso 2543').",
+              description: "Explicação técnica (ex: 'Equilíbrio perfeito de quadrantes, evitando repetição').",
             },
             historicalCheck: {
               type: Type.BOOLEAN,
-              description: "Deve ser true para confirmar que este jogo nunca saiu antes.",
+              description: "Confirmação de que este jogo nunca foi sorteado na história.",
             },
             quadrantAnalysis: {
               type: Type.OBJECT,
               properties: {
-                q1: { type: Type.INTEGER, description: "Números no Quadrante 1 (Superior Esq)" },
-                q2: { type: Type.INTEGER, description: "Números no Quadrante 2 (Superior Dir)" },
-                q3: { type: Type.INTEGER, description: "Números no Quadrante 3 (Inferior Esq)" },
-                q4: { type: Type.INTEGER, description: "Números no Quadrante 4 (Inferior Dir)" },
+                q1: { type: Type.INTEGER, description: "Total números no Q1" },
+                q2: { type: Type.INTEGER, description: "Total números no Q2" },
+                q3: { type: Type.INTEGER, description: "Total números no Q3" },
+                q4: { type: Type.INTEGER, description: "Total números no Q4" },
               },
               required: ["q1", "q2", "q3", "q4"],
             },
@@ -81,7 +79,7 @@ export const generateOptimizedGames = async (quantity: number): Promise<Generati
         systemInstruction: systemInstruction,
         responseMimeType: "application/json",
         responseSchema: responseSchema,
-        temperature: 0.6, // Baixa temperatura para maior rigor lógico e menos alucinação
+        temperature: 0.7,
       },
     });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { generateOptimizedGames } from './services/geminiService';
 import { GenerationResponse } from './types';
 import { GameCard } from './components/GameCard';
@@ -11,6 +11,10 @@ const App: React.FC = () => {
   const [gameCount, setGameCount] = useState<number>(3);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    console.log("MegaSena AI Prophet v3.1 Live - System Ready");
+  }, []);
+
   const handleGenerate = async () => {
     setLoading(true);
     setError(null);
@@ -20,6 +24,7 @@ const App: React.FC = () => {
       const result = await generateOptimizedGames(gameCount);
       setData(result);
     } catch (err) {
+      console.error(err);
       setError("Erro ao conectar com a inteligência artificial. Verifique sua chave API ou tente novamente.");
     } finally {
       setLoading(false);
@@ -29,22 +34,22 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 pb-12">
       {/* Header */}
-      <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-10">
+      <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-10 shadow-lg shadow-emerald-900/10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20">
-               <Clover className="text-emerald-500" size={28} />
+            <div className="bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+               <Clover className="text-emerald-500 animate-pulse" size={28} />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">
-                MegaSena AI Revolution
+              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+                MegaSena AI Prophet
               </h1>
               <p className="text-xs text-slate-400 hidden sm:block">Sistema Preditivo & Verificador Histórico</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+          <div className="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 shadow-inner">
              <BrainCircuit size={16} className="text-purple-400" />
-             <span className="text-xs font-semibold text-slate-300">v3.0 Quantum Logic</span>
+             <span className="text-xs font-semibold text-emerald-400">v3.1 Live</span>
           </div>
         </div>
       </header>
@@ -52,20 +57,22 @@ const App: React.FC = () => {
       <main className="max-w-4xl mx-auto px-4 mt-8">
         
         {/* Intro / Controls */}
-        <section className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-2xl">
-          <div className="text-center mb-8">
+        <section className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+          
+          <div className="text-center mb-8 relative z-10">
             <h2 className="text-3xl font-bold text-white mb-3">Geração Inteligente de Apostas</h2>
             <p className="text-slate-400 max-w-xl mx-auto leading-relaxed">
               Este sistema revolucionário analisa quadrantes, <span className="text-emerald-400 font-semibold">verifica histórico para não repetir a Sena</span> e projeta combinações futuras visando garantir matematicamente a Quadra.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
+            <div className="relative w-full sm:w-auto">
               <select 
                 value={gameCount}
                 onChange={(e) => setGameCount(Number(e.target.value))}
-                className="appearance-none bg-slate-950 text-white pl-4 pr-10 py-3 rounded-xl border border-slate-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all font-semibold"
+                className="w-full sm:w-auto appearance-none bg-slate-950 text-white pl-4 pr-10 py-3 rounded-xl border border-slate-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all font-semibold"
                 disabled={loading}
               >
                 <option value={1}>Gerar 1 Jogo Mestre</option>
@@ -82,14 +89,14 @@ const App: React.FC = () => {
               onClick={handleGenerate}
               disabled={loading}
               className={`
-                group relative px-8 py-3 rounded-xl font-bold text-white shadow-lg transition-all duration-300
+                w-full sm:w-auto group relative px-8 py-3 rounded-xl font-bold text-white shadow-lg transition-all duration-300
                 ${loading 
                   ? 'bg-slate-700 cursor-not-allowed' 
                   : 'bg-emerald-600 hover:bg-emerald-500 hover:shadow-emerald-500/25 active:scale-95'
                 }
               `}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 {loading ? <Loader2 className="animate-spin" /> : <Dna />}
                 <span>{loading ? 'Analisando Futuro...' : 'Gerar Jogos Revolucionários'}</span>
               </div>
@@ -109,7 +116,7 @@ const App: React.FC = () => {
         {data && (
           <div className="mt-12 space-y-8 animate-slide-up">
             
-            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 shadow-inner">
                <h3 className="text-xl font-semibold text-emerald-400 mb-2 flex items-center gap-2">
                  <BrainCircuit className="text-purple-400" /> 
                  Análise Preditiva da IA
@@ -133,12 +140,13 @@ const App: React.FC = () => {
         )}
 
         {/* Footer Disclaimer */}
-        <footer className="mt-16 border-t border-slate-800 pt-8 text-center">
+        <footer className="mt-16 border-t border-slate-800 pt-8 text-center pb-8">
           <p className="text-xs text-slate-500 max-w-2xl mx-auto">
             Aviso Legal: Este aplicativo utiliza inteligência artificial avançada para maximizar probabilidades. 
             Embora projetado para garantir a Quadra através de lógica matemática rigorosa, sorteios são eventos estocásticos. 
             <span className="font-bold text-slate-400">Jogue com responsabilidade.</span>
           </p>
+          <p className="text-[10px] text-slate-700 mt-2 font-mono">Build ID: {new Date().getTime().toString().slice(-6)}</p>
         </footer>
 
       </main>
